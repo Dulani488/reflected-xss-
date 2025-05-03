@@ -1,31 +1,47 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Reflected XSS Demo</title>
-</head>
-<body>
-  <h2>Reflected XSS Test</h2>
-  <form method="GET" action="">
-    <label>Enter payload:</label>
-    <input type="text" name="xss">
-    <button type="submit">Submit</button>
-  </form>
-
-  <hr>
-
-  <p>Result:</p>
-  <div id="result"></div>
-
+  <title>Blog Post</title>
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const payload = params.get('xss');
-    
-    if (payload) {
-      // Reflecting raw payload without sanitization
-      const target = document.getElementById("result");
-      target.innerHTML = payload;
+    // Simulate "admin" visiting with stored XSS triggered
+    window.onload = function () {
+      const postId = new URLSearchParams(window.location.search).get("id");
+      const commentsKey = "comments_" + postId;
+      const comments = JSON.parse(localStorage.getItem(commentsKey) || "[]");
+
+      const commentList = document.getElementById("comment-list");
+      comments.forEach(c => {
+        const div = document.createElement("div");
+        div.innerHTML = c; // 🚨 Deliberate vulnerability: no sanitization!
+        commentList.appendChild(div);
+      });
+
+      // Save new comment
+      document.getElementById("comment-form").onsubmit = function (e) {
+        e.preventDefault();
+        const input = document.getElementById("comment").value;
+        comments.push(input);
+        localStorage.setItem(commentsKey, JSON.stringify(comments));
+        location.reload(); // simulate stored reload
+      };
+    };
+
+    // Dummy /flag endpoint simulation
+    if (location.pathname === "/flag" && location.search.includes("cookie=")) {
+      document.write("<h2>FLAG: THM{stored_xss_steals_sessions}</h2>");
     }
   </script>
+</head>
+<body>
+  <h1>📘 Blog Post #1</h1>
+  <p>This is a simple blog post with a vulnerable comment section.</p>
+
+  <h3>💬 Comments</h3>
+  <div id="comment-list" style="margin-bottom: 20px;"></div>
+
+  <form id="comment-form">
+    <input type="text" id="comment" placeholder="Leave a comment" required />
+    <button type="submit">Submit</button>
+  </form>
 </body>
 </html>
