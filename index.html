@@ -16,24 +16,19 @@
   </form>
 
   <p>Try entering this XSS payload: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></p>
+<script>
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
 
-  <script>
-    // Load existing comments
-    const comments = JSON.parse(localStorage.getItem('comments') || '[]');
-    const commentList = document.getElementById('comment-list');
-    
-    comments.forEach(comment => {
-      commentList.innerHTML += `<div>${comment}</div>`;
-    });
+    if (name) {
+      document.getElementById("output").innerHTML = name;
 
-    // Handle new comments
-    document.getElementById('comment-form').onsubmit = function(e) {
-      e.preventDefault();
-      const comment = document.getElementById('comment').value;
-      comments.push(comment);
-      localStorage.setItem('comments', JSON.stringify(comments));
-      location.reload();
-    };
+      // Check if the reflected name contains the XSS payload
+      if (name.includes("<script>") || name.includes("<img")) {
+        var flag = "flag";
+        alert("Flag: " + flag);
+      }
+    }
   </script>
 </body>
 </html>
