@@ -5,7 +5,7 @@
   <title>XSS Test Page</title>
 </head>
 <body>
-  <h2>Welcome to the XSS Test Page</h2>
+  <h2>Reflected XSS Demo</h2>
   <form method="GET" action="">
     <label for="input">Enter something:</label>
     <input type="text" id="input" name="q">
@@ -17,16 +17,11 @@
   <div id="output"></div>
 
   <script>
-    // Extract query parameter
-    function getParam(name) {
-      const params = new URLSearchParams(window.location.search);
-      return params.get(name);
-    }
-
-    const q = getParam('q');
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get('q');
     if (q) {
-      // Vulnerable output (simulating reflected XSS)
-      document.getElementById('output').innerHTML = "You entered: " + q;
+      // Directly inject into HTML (vulnerable to XSS)
+      document.getElementById('output').innerHTML = q;
     }
   </script>
 </body>
