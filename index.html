@@ -1,49 +1,39 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Simple Blog with XSS Demo</title>
+  <title>XSS Demo</title>
 </head>
 <body>
-  <h1>Blog Post</h1>
-  <p>This is a simple blog with a comment section vulnerable to XSS.</p>
+  <h1>Blog Post #1</h1>
+  <p>This is a simple blog post with a vulnerable comment section.</p>
 
   <h3>Comments</h3>
-  <div id="comments"></div>
+  <div id="comment-list"></div>
 
-  <form onsubmit="addComment(event)">
-    <input type="text" id="comment-input" placeholder="Enter comment">
-    <button type="submit">Post Comment</button>
+  <form id="comment-form">
+    <input type="text" id="comment" placeholder="Leave a comment" required>
+    <button type="submit">Submit</button>
   </form>
 
-  <script>
-    // Load comments when page loads
-    function loadComments() {
-      const comments = JSON.parse(localStorage.getItem('comments') || '[]');
-      const commentsDiv = document.getElementById('comments');
-      
-      comments.forEach(comment => {
-        commentsDiv.innerHTML += `<div>${comment}</div>`;
-      });
-    }
+  <p>Try entering this XSS payload: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></p>
 
-    // Add new comment
-    function addComment(event) {
-      event.preventDefault();
-      const input = document.getElementById('comment-input');
-      const comment = input.value;
-      
-      // Save to localStorage
-      const comments = JSON.parse(localStorage.getItem('comments') || [];
+  <script>
+    // Load existing comments
+    const comments = JSON.parse(localStorage.getItem('comments') || '[]');
+    const commentList = document.getElementById('comment-list');
+    
+    comments.forEach(comment => {
+      commentList.innerHTML += `<div>${comment}</div>`;
+    });
+
+    // Handle new comments
+    document.getElementById('comment-form').onsubmit = function(e) {
+      e.preventDefault();
+      const comment = document.getElementById('comment').value;
       comments.push(comment);
       localStorage.setItem('comments', JSON.stringify(comments));
-      
-      // Display immediately
-      document.getElementById('comments').innerHTML += `<div>${comment}</div>`;
-      input.value = '';
-    }
-
-    // Initialize
-    loadComments();
+      location.reload();
+    };
   </script>
 </body>
 </html>
