@@ -2,26 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>XSS Test Page</title>
+  <title>Reflected XSS Demo</title>
 </head>
 <body>
-  <h2>Reflected XSS Demo</h2>
+  <h2>Reflected XSS Test</h2>
   <form method="GET" action="">
-    <label for="input">Enter something:</label>
-    <input type="text" id="input" name="q">
+    <label>Enter payload:</label>
+    <input type="text" name="xss">
     <button type="submit">Submit</button>
   </form>
 
   <hr>
 
-  <div id="output"></div>
+  <p>Result:</p>
+  <div id="result"></div>
 
   <script>
     const params = new URLSearchParams(window.location.search);
-    const q = params.get('q');
-    if (q) {
-      // Directly inject into HTML (vulnerable to XSS)
-      document.getElementById('output').innerHTML = q;
+    const payload = params.get('xss');
+    
+    if (payload) {
+      // Reflecting raw payload without sanitization
+      const target = document.getElementById("result");
+      target.innerHTML = payload;
     }
   </script>
 </body>
