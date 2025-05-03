@@ -1,22 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>XSS Demo</title>
+  <title>Challenge 01 - Reflected XSS</title>
 </head>
 <body>
-  <h1>Blog Post #1</h1>
-  <p>This is a simple blog post with a vulnerable comment section.</p>
-
-  <h3>Comments</h3>
-  <div id="comment-list"></div>
-
-  <form id="comment-form">
-    <input type="text" id="comment" placeholder="Leave a comment" required>
+  <h1>Reflected XSS</h1>
+  <form action="" method="GET">
+    <input type="text" name="name" placeholder="Enter your name">
     <button type="submit">Submit</button>
   </form>
+  <p>Hello, <span id="output"></span></p>
 
-  <p>Try entering this XSS payload: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></p>
-<script>
+  <script>
     const params = new URLSearchParams(window.location.search);
     const name = params.get("name");
 
@@ -25,7 +20,7 @@
 
       // Check if the reflected name contains the XSS payload
       if (name.includes("<script>") || name.includes("<img")) {
-        var flag = "flag";
+        var flag = "FLAG";
         alert("Flag: " + flag);
       }
     }
