@@ -1,27 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Reflected XSS Demo</title>
+  <meta charset="UTF-8">
+  <title>XSS Test Page</title>
 </head>
 <body>
-  <h1>Search Something</h1>
-
+  <h2>Welcome to the XSS Test Page</h2>
   <form method="GET" action="">
-    <input type="text" name="q" placeholder="Type here">
-    <button type="submit">Search</button>
+    <label for="input">Enter something:</label>
+    <input type="text" id="input" name="q">
+    <button type="submit">Submit</button>
   </form>
 
   <hr>
-  <h2>Search Results:</h2>
-  <div id="result"></div>
+
+  <div id="output"></div>
 
   <script>
-    const params = new URLSearchParams(window.location.search);
-    const q = params.get("q");
+    // Extract query parameter
+    function getParam(name) {
+      const params = new URLSearchParams(window.location.search);
+      return params.get(name);
+    }
 
+    const q = getParam('q');
     if (q) {
-      // Directly inject unescaped input — vulnerable to reflected XSS
-      document.getElementById("result").innerHTML = q;
+      // Vulnerable output (simulating reflected XSS)
+      document.getElementById('output').innerHTML = "You entered: " + q;
     }
   </script>
 </body>
