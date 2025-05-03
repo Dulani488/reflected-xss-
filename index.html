@@ -1,54 +1,49 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Blog Post</title>
-  <script>
-    // Simulate "admin" visiting with stored XSS triggered
-    window.onload = function () {
-      const postId = new URLSearchParams(window.location.search).get("id");
-      const commentsKey = "comments_" + postId;
-      const comments = JSON.parse(localStorage.getItem(commentsKey) || "[]");
-
-      const commentList = document.getElementById("comment-list");
-      comments.forEach(c => {
-        const div = document.createElement("div");
-        div.innerHTML = c; // 🚨 Deliberate vulnerability: no sanitization!
-        commentList.appendChild(div);
-        
-        // Check if comment contains our XSS payload
-        if (c.includes("<script>alert") || c.includes("img src=x onerror=alert")) {
-          eval(c.split("<script>")[1].split("</script>")[0]); // Extract and execute JS
-        }
-      });
-
-      // Save new comment
-      document.getElementById("comment-form").onsubmit = function (e) {
-        e.preventDefault();
-        const input = document.getElementById("comment").value;
-        comments.push(input);
-        localStorage.setItem(commentsKey, JSON.stringify(comments));
-        location.reload(); // simulate stored reload
-      };
-    };
-
-    // Dummy /flag endpoint simulation
-    if (location.pathname === "/flag" && location.search.includes("cookie=")) {
-      document.write("<h2>FLAG: THM{stored_xss_steals_sessions}</h2>");
-    }
-  </script>
+  <title>Simple Blog with XSS Demo</title>
 </head>
 <body>
-  <h1>📘 Blog Post #1</h1>
-  <p>This is a simple blog post with a vulnerable comment section.</p>
+  <h1>Blog Post</h1>
+  <p>This is a simple blog with a comment section vulnerable to XSS.</p>
 
-  <h3>💬 Comments</h3>
-  <div id="comment-list" style="margin-bottom: 20px;"></div>
+  <h3>Comments</h3>
+  <div id="comments"></div>
 
-  <form id="comment-form">
-    <input type="text" id="comment" placeholder="Leave a comment" required />
-    <button type="submit">Submit</button>
+  <form onsubmit="addComment(event)">
+    <input type="text" id="comment-input" placeholder="Enter comment">
+    <button type="submit">Post Comment</button>
   </form>
-  
-  <p>Try entering this XSS payload: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></p>
+
+  <script>
+    // Load comments when page loads
+    function loadComments() {
+      const comments = JSON.parse(localStorage.getItem('comments') || '[]');
+      const commentsDiv = document.getElementById('comments');
+      
+      comments.forEach(comment => {
+        commentsDiv.innerHTML += `<div>${comment}</div>`;
+      });
+    }
+
+    // Add new comment
+    function addComment(event) {
+      event.preventDefault();
+      const input = document.getElementById('comment-input');
+      const comment = input.value;
+      
+      // Save to localStorage
+      const comments = JSON.parse(localStorage.getItem('comments') || [];
+      comments.push(comment);
+      localStorage.setItem('comments', JSON.stringify(comments));
+      
+      // Display immediately
+      document.getElementById('comments').innerHTML += `<div>${comment}</div>`;
+      input.value = '';
+    }
+
+    // Initialize
+    loadComments();
+  </script>
 </body>
 </html>
